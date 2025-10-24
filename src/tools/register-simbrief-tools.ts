@@ -113,7 +113,7 @@ export function registerSimBriefTools(server: McpServer, env: Env, props: Props)
   // Register get latest flight plan (full data - preferred)
   server.tool(
     "getLatestFlightPlan",
-    "[PREFERRED/DEFAULT] Get comprehensive flight plan data for the latest SimBrief flight plan in readable markdown format. Includes route, fuel, weather, weights, navigation, and all essential flight planning information. Use this tool by default.",
+    "[PREFERRED/DEFAULT] Get comprehensive flight plan for the latest SimBrief flight plan in professional markdown format. Includes: complete route with SID/STAR, fuel planning with breakdown, takeoff/landing performance with V-speeds for all runways, weather (METAR/TAF/SIGMETs), critical NOTAMs (runway/lighting/navigation), weight & balance, navigation waypoints, ETOPS data, NAT tracks, performance impact analysis, and complete ATC flight plan text. Optimized for readability (~50-80KB vs 1.3MB raw). Use this tool by default for all flight plan requests.",
     GetLatestFlightPlanSchema,
     wrapWithSentry("getLatestFlightPlan", async ({ userId }) => {
       const result = await fetchSimBriefFlightPlan({ userId, apiKey });
@@ -147,7 +147,7 @@ export function registerSimBriefTools(server: McpServer, env: Env, props: Props)
   // Register get flight plan by ID (full data)
   server.tool(
     "getFlightPlanById",
-    "Get comprehensive flight plan data for a specific SimBrief flight plan by ID in readable markdown format. Includes route, fuel, weather, weights, navigation, and all essential flight planning information.",
+    "Get comprehensive flight plan for a specific SimBrief flight plan by ID (21-character identifier) in professional markdown format. Returns same comprehensive data as getLatestFlightPlan including: route, fuel planning, takeoff/landing performance with V-speeds, weather, critical NOTAMs, weights, navigation, ETOPS, NAT tracks, and performance analysis. Use when user provides a specific plan ID.",
     GetFlightPlanByIdSchema,
     wrapWithSentry("getFlightPlanById", async ({ userId, planId }) => {
       const result = await fetchSimBriefFlightPlan({ userId, planId, apiKey });
@@ -181,7 +181,7 @@ export function registerSimBriefTools(server: McpServer, env: Env, props: Props)
   // Register get dispatch briefing
   server.tool(
     "getDispatchBriefing",
-    "Get a concise operational briefing from the latest flight plan with key information for flight operations (fuel, weather, route summary).",
+    "Get a concise operational dispatch briefing from the latest flight plan. Returns quick-reference format with: flight info, route summary (departure/arrival with runways), fuel breakdown, weights (ZFW/TOW/LDW), departure/arrival METAR, and ETOPS status. Use only when user specifically requests a 'dispatch briefing' or quick summary. For complete details, use getLatestFlightPlan instead.",
     GetDispatchBriefingSchema,
     wrapWithSentry("getDispatchBriefing", async ({ userId }) => {
       const result = await fetchSimBriefFlightPlan({ userId, apiKey });
@@ -253,7 +253,7 @@ ${briefing.operational.etops !== 'NO' ? `⚠️ ETOPS Flight - ${briefing.operat
   // Register get latest flight plan summary
   server.tool(
     "getLatestFlightPlanSummary",
-    "Get a summary of your latest flight plan. Only use if user specifically asks for a 'summary' or 'brief overview'.",
+    "Get basic summary of latest flight plan with minimal detail (plan ID, flight number, aircraft, route, distance, flight time, date only). Much less comprehensive than getLatestFlightPlan. Use ONLY if user explicitly requests a 'summary' or 'brief overview'. For normal requests, use getLatestFlightPlan instead.",
     GetLatestFlightPlanSchema,
     wrapWithSentry("getLatestFlightPlanSummary", async ({ userId }) => {
       const result = await fetchSimBriefFlightPlan({ userId, apiKey });
@@ -286,7 +286,7 @@ ${briefing.operational.etops !== 'NO' ? `⚠️ ETOPS Flight - ${briefing.operat
   // Register get flight plan by ID summary
   server.tool(
     "getFlightPlanByIdSummary",
-    "Get a summary of a specific flight plan by ID.",
+    "Get basic summary of a specific flight plan by ID (plan ID, flight number, aircraft, route, distance, flight time only). Minimal detail compared to getFlightPlanById. Use only for brief summaries when user provides a plan ID and explicitly wants limited information.",
     GetFlightPlanByIdSchema,
     wrapWithSentry("getFlightPlanByIdSummary", async ({ userId, planId }) => {
       const result = await fetchSimBriefFlightPlan({ userId, planId, apiKey });
@@ -319,7 +319,7 @@ ${briefing.operational.etops !== 'NO' ? `⚠️ ETOPS Flight - ${briefing.operat
   // Register get NOTAMs tool
   server.tool(
     "getNotams",
-    "Get all NOTAMs (Notices to Airmen) for airports in the flight plan. Returns complete NOTAM details including runway closures, navigation changes, lighting issues, and other operational restrictions. Use this when you need detailed NOTAM information beyond the critical NOTAMs shown in the main briefing.",
+    "Get ALL NOTAMs (Notices to Airmen) for airports in the flight plan. Returns complete, unfiltered NOTAM details for origin, destination, and/or alternate airports including: NOTAM ID, category (runway/lighting/navigation/etc.), status, effective dates, location, and full text. Use when you need comprehensive NOTAM information beyond the critical NOTAMs automatically included in getLatestFlightPlan, or when user specifically asks about NOTAMs. Optional 'airport' parameter: 'origin', 'destination', 'alternate', or 'all' (default).",
     GetNotamsSchema,
     wrapWithSentry("getNotams", async ({ userId, airport = "all" }) => {
       const result = await fetchSimBriefFlightPlan({ userId, apiKey });
