@@ -1,0 +1,36 @@
+name = "simbrief-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-03-10"
+compatibility_flags = ["nodejs_compat"]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SimBriefMCP"]
+
+[[durable_objects.bindings]]
+name = "MCP_OBJECT"
+class_name = "SimBriefMCP"
+
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "aa8bce4a7aa34c9c97a4788c76704929" # Replace with actual KV namespace ID
+
+[ai]
+binding = "AI"
+
+[observability]
+enabled = true
+
+[dev]
+port = 8792
+
+[version_metadata]
+binding = "CF_VERSION_METADATA"
+
+# Environment Variables (use wrangler secret put for sensitive values)
+# Required secrets:
+# - GOOGLE_CLIENT_ID
+# - GOOGLE_CLIENT_SECRET
+# - COOKIE_ENCRYPTION_KEY
+# - SIMBRIEF_API_KEY (optional - improves rate limits)
+# - SENTRY_DSN (optional)

@@ -1,0 +1,18 @@
+# Copy this file to .dev.vars and fill in your actual values
+# DO NOT commit .dev.vars to version control
+
+# Google OAuth Credentials
+GOOGLE_CLIENT_ID=your-google-client-id-here
+GOOGLE_CLIENT_SECRET=your-google-client-secret-here
+
+# Cookie Encryption (generate with: openssl rand -base64 32)
+COOKIE_ENCRYPTION_KEY=your-32-character-random-string-here
+
+# SimBrief API Key (optional - improves rate limits)
+SIMBRIEF_API_KEY=your-simbrief-api-key-here
+
+# Sentry DSN (optional - for error tracking)
+SENTRY_DSN=https://your-dsn@sentry.io/project-id
+
+# Environment (optional - defaults to "production")
+ENVIRONMENT=development

@@ -1,0 +1,47 @@
+{
+  "name": "simbrief-mcp",
+  "version": "1.0.0",
+  "description": "SimBrief Flight Planning MCP Server with Google OAuth on Cloudflare Workers",
+  "main": "src/index.ts",
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "cf-typegen": "wrangler types",
+    "type-check": "tsc --noEmit",
+    "build": "tsc",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
+  },
+  "keywords": [
+    "mcp",
+    "simbrief",
+    "flight-planning",
+    "cloudflare-workers",
+    "oauth"
+  ],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^0.0.5",
+    "@modelcontextprotocol/sdk": "^1.15.1",
+    "@sentry/cloudflare": "^10.17.0",
+    "agents": "^0.0.100",
+    "hono": "^4.8.3",
+    "mcp-remote": "^0.1.29",
+    "workers-mcp": "^0.0.13",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.8.53",
+    "@types/node": "^24.0.13",
+    "@vitest/ui": "^3.2.4",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3",
+    "vi-fetch": "^0.8.0",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.23.0"
+  }
+}
