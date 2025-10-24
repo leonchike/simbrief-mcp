@@ -1,10 +1,3 @@
-**Complete Flight Plan Data**
-
-Flight: N/A
-Route: N/A - N/A
-Plan ID: N/A
-
-```json
 {
   "fetch": {
     "userid": "57083",
@@ -21087,4 +21080,3 @@ Plan ID: N/A
     "acdata_parsed": "{\"basetype\":\"B77F\",\"icao\":\"B77L\",\"reg\":\"N777F\",\"fin\":\"715\",\"selcal\":\"ERMP\",\"hexcode\":\"\",\"name\":\"B777-F\",\"engines\":\"GE90-110B1\",\"comments\":\"(DEFAULT) MTOW 766800\",\"cat\":\"H\",\"per\":\"D\",\"equip\":\"SDE1E2E3FGHIJ2J3J4J5M1RWXYZ\",\"transponder\":\"LB1D1\",\"pbn\":\"PBN\\/A1B1C1D1L1O1S2\",\"extrarmk\":\"\",\"wgtunits\":\"LBS\",\"maxpax\":\"4\",\"paxwgt\":190,\"bagwgt\":55,\"oew\":318.68,\"mzfw\":547,\"mtow\":766.8,\"mlw\":575,\"maxfuel\":320.831,\"maxcargo\":229.06,\"defaultcruise\":\"CI\",\"defaultci\":\"\",\"defaultclimb\":\"250\\/310\\/84\",\"defaultdescent\":\"84\\/310\\/250\",\"fuelfactor\":\"P02\",\"ceiling\":\"43000\",\"thrust\":\"110000\",\"thrust_units\":\"lbf\",\"flatrating\":\"\",\"cruiseoffset\":\"P0000\",\"etopsthreshold\":\"60\",\"etopsrange\":\"330\",\"planunits\":\"\",\"cargomode\":\"\",\"planformat\":\"\",\"flightrules\":\"\",\"flighttype\":\"\",\"altnsadv_radius\":\"452\",\"altnsadv_rwy\":\"7000\",\"altnsadv_units_rwy\":\"ft\",\"manualrmk\":\"\",\"contpct\":\"\",\"resvrule\":\"\",\"taxifuel\":\"\",\"minfob\":\"\",\"minfod\":\"\",\"melfuel\":\"\",\"atcfuel\":\"\",\"wxxfuel\":\"\",\"addedfuel\":\"\",\"tankering\":\"\",\"minfob_units\":\"wgt\",\"minfod_units\":\"wgt\",\"melfuel_units\":\"wgt\",\"atcfuel_units\":\"wgt\",\"wxxfuel_units\":\"wgt\",\"addedfuel_units\":\"wgt\",\"tankering_units\":\"wgt\",\"addedfuel_label\":\"extra\"}"
   }
 }
-```
