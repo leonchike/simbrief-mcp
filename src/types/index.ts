@@ -110,3 +110,73 @@ export interface SimBriefApiResponse {
   error?: string;
   isError: boolean;
 }
+
+// VATSIM ATIS types
+export interface VatsimAtisResponse {
+  /** Timestamp when data was fetched from VATSIM */
+  fetchedAt: string; // ISO 8601 datetime
+  /** Number of airports with active ATIS */
+  activeCount: number;
+  /** Results for each requested airport */
+  airports: AirportAtis[];
+}
+
+export interface AirportAtis {
+  /** ICAO code of the airport */
+  icao: string;
+  /** Whether any ATIS is active for this airport */
+  hasActiveAtis: boolean;
+  /** Combined ATIS (if available) */
+  combined: AtisData | null;
+  /** Arrival ATIS (if available) */
+  arrival: AtisData | null;
+  /** Departure ATIS (if available) */
+  departure: AtisData | null;
+}
+
+export interface AtisData {
+  /** Full callsign (e.g., "EKCH_A_ATIS") */
+  callsign: string;
+  /** ATIS information letter (e.g., "A", "B", "D") */
+  atisCode: string | null;
+  /** Radio frequency */
+  frequency: string;
+  /** ATIS text as a single joined string */
+  textAtis: string | null;
+  /** ATIS text as original array of lines */
+  textAtisLines: string[] | null;
+  /** Controller name */
+  controllerName: string;
+  /** Controller CID */
+  controllerCid: number;
+  /** When ATIS was last updated */
+  lastUpdated: string; // ISO 8601 datetime
+  /** When controller logged on */
+  logonTime: string; // ISO 8601 datetime
+}
+
+// VATSIM API raw data types (from the API response)
+export interface VatsimDataResponse {
+  general: {
+    update_timestamp: string;
+    [key: string]: any;
+  };
+  atis: VatsimAtisEntry[];
+  [key: string]: any;
+}
+
+export interface VatsimAtisEntry {
+  cid: number;
+  name: string;
+  callsign: string;
+  frequency: string;
+  facility: number;
+  rating: number;
+  server: string;
+  visual_range: number;
+  text_atis: string[] | null;
+  last_updated: string;
+  logon_time: string;
+  atis_code: string | null;
+  [key: string]: any;
+}

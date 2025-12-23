@@ -14,6 +14,7 @@ import {
   formatFlightPlanSummary,
 } from "./simbrief-api.js";
 import { formatFlightPlanMarkdown } from "./format-flight-plan.js";
+import { getVatsimAtis, createErrorResponse } from "./vatsim-api.js";
 
 // Define Zod schemas for input validation
 const GetLatestFlightPlanSchema = {
@@ -32,6 +33,10 @@ const GetDispatchBriefingSchema = {
 const GetNotamsSchema = {
   userId: z.string().describe("SimBrief User ID (required) - found in SimBrief Account Settings"),
   airport: z.enum(["origin", "destination", "alternate", "all"]).default("all").describe("Which airport's NOTAMs to retrieve: origin, destination, alternate, or all"),
+};
+
+const GetVatsimAtisSchema = {
+  icaoCodes: z.array(z.string()).min(1).max(20).describe("Array of ICAO airport codes (e.g., [\"KJFK\", \"EKCH\", \"EGLL\"]) - minimum 1, maximum 20 codes"),
 };
 
 /**
@@ -384,4 +389,105 @@ ${notam.notam_schedule ? `- **Schedule**: ${notam.notam_schedule}` : ''}
       };
     })
   );
+
+  // Register VATSIM ATIS tool
+  server.tool(
+    "getVatsimAtis",
+    "Retrieve active ATIS (Automatic Terminal Information Service) information from the VATSIM network for specified airports. Returns combined, arrival, and departure ATIS data when available, including: ATIS code, frequency, full text, controller details, and timestamps. Supports 1-20 ICAO codes per request. Use this when you need real-time ATIS from VATSIM controllers for flight simulation or virtual ATC operations.",
+    GetVatsimAtisSchema,
+    wrapWithSentry("getVatsimAtis", async ({ icaoCodes }) => {
+      try {
+        const result = await getVatsimAtis(icaoCodes);
+
+        // Format result as readable markdown
+        let text = `# VATSIM ATIS Information\n\n`;
+        text += `**Fetched**: ${new Date(result.fetchedAt).toUTCString()}\n`;
+        text += `**Active Stations**: ${result.activeCount} of ${result.airports.length} airports\n\n`;
+        text += `---\n\n`;
+
+        for (const airport of result.airports) {
+          text += `## ${airport.icao}\n\n`;
+
+          if (!airport.hasActiveAtis) {
+            text += `*No active ATIS*\n\n`;
+            continue;
+          }
+
+          // Combined ATIS
+          if (airport.combined) {
+            text += formatAtisSection("Combined ATIS", airport.combined);
+          }
+
+          // Arrival ATIS
+          if (airport.arrival) {
+            text += formatAtisSection("Arrival ATIS", airport.arrival);
+          }
+
+          // Departure ATIS
+          if (airport.departure) {
+            text += formatAtisSection("Departure ATIS", airport.departure);
+          }
+
+          text += `---\n\n`;
+        }
+
+        text += `*Data from VATSIM Network - Updates every ~15 seconds*`;
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: text,
+            },
+          ],
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+
+        // Determine error code based on message
+        let errorCode = "UPSTREAM_ERROR";
+        if (errorMessage.includes("non-empty array") || errorMessage.includes("Invalid ICAO")) {
+          errorCode = "INVALID_INPUT";
+        } else if (errorMessage.includes("Maximum 20")) {
+          errorCode = "TOO_MANY_CODES";
+        } else if (errorMessage.includes("unavailable") || errorMessage.includes("timed out")) {
+          errorCode = "UPSTREAM_UNAVAILABLE";
+        }
+
+        const errorResponse = createErrorResponse(errorCode, errorMessage);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: `**Error [${errorResponse.error.code}]**\n\n${errorResponse.error.message}`,
+              isError: true,
+            },
+          ],
+        };
+      }
+    })
+  );
+}
+
+/**
+ * Helper function to format ATIS data section
+ */
+function formatAtisSection(title: string, atis: any): string {
+  let section = `### ${title}\n\n`;
+  section += `**Callsign**: ${atis.callsign}\n`;
+  section += `**Frequency**: ${atis.frequency}\n`;
+  section += `**ATIS Code**: ${atis.atisCode || "N/A"}\n`;
+  section += `**Controller**: ${atis.controllerName} (CID: ${atis.controllerCid})\n`;
+  section += `**Last Updated**: ${new Date(atis.lastUpdated).toUTCString()}\n`;
+  section += `**Logon Time**: ${new Date(atis.logonTime).toUTCString()}\n\n`;
+
+  if (atis.textAtis) {
+    section += `**ATIS Text**:\n\n`;
+    section += `> ${atis.textAtis}\n\n`;
+  } else {
+    section += `*No ATIS text available*\n\n`;
+  }
+
+  return section;
 }
