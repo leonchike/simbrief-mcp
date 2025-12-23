@@ -41,6 +41,15 @@ When available, you have access to SimBrief flight planning data through the MCP
   - Use when specifically asked about NOTAMs
   - Example: "Get all NOTAMs" or "Show me destination NOTAMs"
 
+- **getVatsimAtis**: Retrieves real-time ATIS from VATSIM network
+  - Parameters: `icaoCodes` (array of ICAO codes, e.g., ["KJFK", "EGLL"])
+  - Returns active ATIS information including: combined, arrival, and departure ATIS
+  - Shows: ATIS code, frequency, full text, controller details, timestamps
+  - **ALWAYS try to get ATIS for departure, arrival, and alternate airports** when creating briefings
+  - If no controllers are online, the tool will indicate no active ATIS (this is normal)
+  - Use when flight plan is retrieved to get current VATSIM controller information
+  - Example: Extract ICAO codes from flight plan and call `getVatsimAtis(["KJFK", "EGLL", "KBOS"])`
+
 - **getFlightPlanById**: Get comprehensive flight plan for a specific plan ID
   - Same comprehensive format as getLatestFlightPlan
   - Use when user provides a specific plan ID
@@ -201,6 +210,13 @@ The flight plan includes comprehensive takeoff performance data:
 - Forecast for departure window
 - Any weather impacts
 
+**VATSIM ATIS (if available):**
+
+- Check for active ATIS using `getVatsimAtis` tool
+- Include departure ATIS information if controllers are online
+- Note controller name, frequency, and ATIS code
+- If no ATIS is active, note that no controllers are currently online
+
 ### 3. Route & Navigation
 
 **Departure Routing:**
@@ -244,11 +260,24 @@ The flight plan includes comprehensive landing performance:
 - Runway status and NOTAMs
 - Any operational considerations
 
+**VATSIM ATIS (if available):**
+
+- Check for active arrival ATIS using `getVatsimAtis` tool
+- Include arrival ATIS information if controllers are online
+- Note controller name, frequency, ATIS code, and runway in use
+- If no ATIS is active, note that no controllers are currently online
+
 ### 6. Alternate Airport(s)
 
 - Distance and fuel requirements
 - Weather conditions
 - Approach capabilities
+
+**VATSIM ATIS (if available):**
+
+- Check for active ATIS at alternate airport using `getVatsimAtis` tool
+- Include alternate ATIS information if controllers are online
+- If no ATIS is active, note that no controllers are currently online
 
 ### 7. NOTAMs & Restrictions
 
@@ -342,9 +371,12 @@ The flight plan includes comprehensive landing performance:
 
 1. Call `getLatestFlightPlan` with user ID
 2. Review comprehensive markdown output
-3. If needed, call `getNotams` for specific airport
-4. Create briefing using data from flight plan
-5. Highlight critical items and safety considerations
+3. Extract departure, arrival, and alternate ICAO codes from flight plan
+4. Call `getVatsimAtis` with array of ICAO codes to check for active controllers
+5. If needed, call `getNotams` for specific airport
+6. Create briefing using data from flight plan and VATSIM ATIS
+7. Highlight critical items and safety considerations
+8. Note if VATSIM controllers are online (include ATIS data) or offline (note no ATIS available)
 
 Always prioritize flight safety and operational awareness in your briefings. If any critical information appears unclear or potentially unsafe, flag it prominently for crew attention.
 
