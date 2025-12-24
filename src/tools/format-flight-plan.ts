@@ -16,17 +16,17 @@ export function formatFlightPlanMarkdown(data: SimBriefFlightPlan): string {
   const times = data.times || {};
   const aircraft = data.aircraft || {};
   const atc = data.atc || {};
-  const navlog = data.navlog?.fix || [];
+  const navlog = Array.isArray(data.navlog?.fix) ? data.navlog.fix : [];
   const etops = data.etops || {};
   const tlr = data.tlr || {};
-  const sigmets = data.sigmets?.sigmet || [];
+  const sigmets = Array.isArray(data.sigmets?.sigmet) ? data.sigmets.sigmet : [];
   const tracks = data.tracks || {};
   const impacts = data.impacts || {};
 
-  // Collect NOTAMs from all airports
-  const originNotams = origin.notam || [];
-  const destNotams = destination.notam || [];
-  const altNotams = alternate.notam || [];
+  // Collect NOTAMs from all airports (ensure they are arrays)
+  const originNotams = Array.isArray(origin.notam) ? origin.notam : [];
+  const destNotams = Array.isArray(destination.notam) ? destination.notam : [];
+  const altNotams = Array.isArray(alternate.notam) ? alternate.notam : [];
 
   // Filter for critical NOTAMs (runway closures, lighting issues, navigation changes)
   const criticalCategories = ['Runway', 'Lighting', 'Navigation', 'Obstacle', 'Aerodrome'];
@@ -194,12 +194,12 @@ ${tlr.takeoff?.conditions ? `
 ### Runway Analysis
 | RWY | Length | Wind | V1 | VR | V2 | VREF | Flex | Max Wt | Limit |
 |-----|--------|------|----|----|----|----|------|--------|-------|
-${tlr.takeoff.runway?.map((rwy: any) =>
+${Array.isArray(tlr.takeoff.runway) ? tlr.takeoff.runway.map((rwy: any) =>
   `| ${rwy.identifier || 'N/A'} | ${rwy.length || 'N/A'}ft | ${rwy.headwind_component > 0 ? '+' : ''}${rwy.headwind_component || 'N/A'}/${Math.abs(rwy.crosswind_component || 0)} | ${rwy.speeds_v1 || 'N/A'} | ${rwy.speeds_vr || 'N/A'} | ${rwy.speeds_v2 || 'N/A'} | ${rwy.speeds_other || 'N/A'} | ${rwy.flex_temperature || 'N/A'}°C | ${rwy.max_weight || 'N/A'} | ${rwy.limit_code || 'N/A'} |`
-).join('\n') || '| No data | | | | | | | | | |'}
+).join('\n') : '| No data | | | | | | | | | |'}
 
 **Distances** (Planned RWY ${tlr.takeoff.conditions.planned_runway || 'N/A'}):
-${tlr.takeoff.runway?.find((r: any) => r.identifier === tlr.takeoff.conditions.planned_runway) ?
+${Array.isArray(tlr.takeoff.runway) && tlr.takeoff.runway.find((r: any) => r.identifier === tlr.takeoff.conditions.planned_runway) ?
   `- Decision: ${tlr.takeoff.runway.find((r: any) => r.identifier === tlr.takeoff.conditions.planned_runway).distance_decide || 'N/A'}ft
 - Reject: ${tlr.takeoff.runway.find((r: any) => r.identifier === tlr.takeoff.conditions.planned_runway).distance_reject || 'N/A'}ft
 - Continue: ${tlr.takeoff.runway.find((r: any) => r.identifier === tlr.takeoff.conditions.planned_runway).distance_continue || 'N/A'}ft
@@ -219,9 +219,9 @@ ${tlr.landing?.conditions ? `
 ### Runway Analysis
 | RWY | Length | Wind | Max Wt Dry | Max Wt Wet | ILS |
 |-----|--------|------|------------|------------|-----|
-${tlr.landing.runway?.map((rwy: any) =>
+${Array.isArray(tlr.landing.runway) ? tlr.landing.runway.map((rwy: any) =>
   `| ${rwy.identifier || 'N/A'} | ${rwy.length || 'N/A'}ft | ${rwy.headwind_component > 0 ? '+' : ''}${rwy.headwind_component || 'N/A'}/${Math.abs(rwy.crosswind_component || 0)} | ${rwy.max_weight_dry || 'N/A'} | ${rwy.max_weight_wet || 'N/A'} | ${rwy.ils_frequency || 'N/A'} |`
-).join('\n') || '| No data | | | | | |'}
+).join('\n') : '| No data | | | | | |'}
 ` : '*Landing performance data not available*'}
 
 ## Critical NOTAMs
@@ -268,7 +268,7 @@ ${sigmets.slice(0, 5).map((sigmet: any) =>
 ${sigmets.length > 5 ? `*... and ${sigmets.length - 5} more SIGMETs*` : ''}
 ` : '*No active SIGMETs*'}
 
-${tracks.nat && tracks.nat.length > 0 ? `
+${Array.isArray(tracks.nat) && tracks.nat.length > 0 ? `
 ## NAT Tracks
 ${tracks.nat.map((track: any) =>
   `**Track ${track.ident || 'N/A'}**: ${track.route || 'N/A'}
