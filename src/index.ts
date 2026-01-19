@@ -17,11 +17,7 @@ function getSentryConfig(env: Env) {
   };
 }
 
-export class SimBriefMCP extends McpAgent<
-  Env,
-  Record<string, never>,
-  Props
-> {
+export class SimBriefMCP extends McpAgent<Env, Record<string, never>, Props> {
   server = new McpServer({
     name: "SimBrief Flight Planning MCP Server",
     version: "1.0.0",
@@ -90,20 +86,18 @@ const oauthProvider = new OAuthProvider({
   clientRegistrationEndpoint: "/register",
   defaultHandler: GoogleHandler as any,
   tokenEndpoint: "/token",
+  accessTokenTTL: 365 * 24 * 60 * 60, // 365 days (31,536,000 seconds)
 });
 
-export default Sentry.withSentry(
-  (env: Env) => {
-    const sentryConfig = getSentryConfig(env);
-    return {
-      dsn: sentryConfig.dsn,
-      tracesSampleRate: sentryConfig.tracesSampleRate,
-      environment: sentryConfig.environment,
-      // Adds request headers and IP for users
-      sendDefaultPii: true,
-      // Enable logs to be sent to Sentry
-      enableLogs: true,
-    };
-  },
-  oauthProvider
-);
+export default Sentry.withSentry((env: Env) => {
+  const sentryConfig = getSentryConfig(env);
+  return {
+    dsn: sentryConfig.dsn,
+    tracesSampleRate: sentryConfig.tracesSampleRate,
+    environment: sentryConfig.environment,
+    // Adds request headers and IP for users
+    sendDefaultPii: true,
+    // Enable logs to be sent to Sentry
+    enableLogs: true,
+  };
+}, oauthProvider);
